@@ -1,10 +1,25 @@
 import React, { useState } from "react";
 import "./TicTacToe.css";
 
+const historyArr = [];
+
+const storeHistory = (result) => {
+  historyArr.push(result);
+  return localStorage.setItem("history", JSON.stringify(historyArr));
+};
+
+const getHistory = (result) => {
+  return localStorage.getItem("history", JSON.stringify(result));
+};
+console.log("history arr: ", historyArr);
+console.log(getHistory);
+
 const TicTacToe = () => {
   const [turn, setTurn] = useState("x");
   const [cells, setCells] = useState(Array(9).fill(""));
   const [winner, setWinner] = useState();
+  const [history, setHistory] = useState([]);
+  const [selector, setSelector] = useState("");
 
   const checkForWinner = (squares) => {
     let combos = {
@@ -57,12 +72,18 @@ const TicTacToe = () => {
       squares[num] = "o";
       setTurn("x");
     }
-
     checkForWinner(squares);
     setCells(squares);
+    // if winner => td {pointer-evets: none;}
+    // if (winner) {
+    //   return ;
+    // }
   };
 
   const handleRestart = () => {
+    setHistory((p) => [...p, winner]);
+    storeHistory(winner);
+    setTurn("x");
     setWinner(null);
     setCells(Array(9).fill(""));
   };
@@ -73,6 +94,10 @@ const TicTacToe = () => {
 
   return (
     <div className="container">
+      {history.length > 0 &&
+        history.map((item) => {
+          return <p>{item} won this game</p>;
+        })}
       <table>
         Turn: {turn}
         <tbody>
